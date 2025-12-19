@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --color-bg: #731135;
+  --color-surface: rgba(255, 255, 255, 0.06);
+  --color-foreground: #e5e7eb;
+  --color-muted: #f4f4f4;
+  --color-accent: #ef8014;
+  --color-accent-foreground: #0b1021;
+  --color-border: rgba(255, 255, 255, 0.12);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  @apply min-h-screen antialiased;
+  background: var(--color-bg);
+  color: var(--color-foreground);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@keyframes logo-bounce-in {
+  0% {
+    transform: translateY(120%);
+    opacity: 0;
+  }
+  55% {
+    transform: translateY(-14%);
+    opacity: 1;
+  }
+  72% {
+    transform: translateY(8%);
+  }
+  84% {
+    transform: translateY(-5%);
+  }
+  92% {
+    transform: translateY(3%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-logo-bounce {
+    animation: logo-bounce-in 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  }
+}

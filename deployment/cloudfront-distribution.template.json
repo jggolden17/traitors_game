@@ -1,0 +1,41 @@
+{
+  "CallerReference": "__CALLER_REFERENCE__",
+  "Comment": "__COMMENT__",
+  "Enabled": true,
+  "Origins": {
+    "Items": [
+      {
+        "Id": "__ORIGIN_ID__",
+        "DomainName": "__BUCKET_NAME__.s3.__AWS_REGION__.amazonaws.com",
+        "S3OriginConfig": {
+          "OriginAccessIdentity": ""
+        },
+        "OriginAccessControlId": "__OAC_ID__"
+      }
+    ],
+    "Quantity": 1
+  },
+  "DefaultCacheBehavior": {
+    "TargetOriginId": "__ORIGIN_ID__",
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "AllowedMethods": {
+      "Items": ["GET", "HEAD", "OPTIONS"],
+      "CachedMethods": { "Items": ["GET", "HEAD"], "Quantity": 2 },
+      "Quantity": 3
+    },
+    "Compress": true,
+    "DefaultTTL": 3600,
+    "MinTTL": 0,
+    "MaxTTL": 86400,
+    "ForwardedValues": { "QueryString": true, "Cookies": { "Forward": "none" } }
+  },
+  "PriceClass": "PriceClass_100",
+  "CustomErrorResponses": {
+    "Quantity": 2,
+    "Items": [
+      { "ErrorCode": 403, "ResponsePagePath": "/index.html", "ResponseCode": "200", "ErrorCachingMinTTL": 0 },
+      { "ErrorCode": 404, "ResponsePagePath": "/index.html", "ResponseCode": "200", "ErrorCachingMinTTL": 0 }
+    ]
+  },
+  "DefaultRootObject": "index.html"
+}
