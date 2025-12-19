@@ -32,11 +32,11 @@ I'd like to get a working version of this done in an hour or so.
     * progressive web app to easily use on phone w/o going via app store
 
 
-Specific implementation plan for V1 is [here](./docs/planning/v1_implementation_plan)
+Specific implementation plan for V1 is [here](./docs/planning/v1_implementation_plan.md)
 
 ### Longer term extensions to project
 
-I have several ideas for how to make this game more useable, that I might not implement immediately. Tracking these in [docs/planning/extension_ideas](./docs/planning/extension_ideas)
+I have several ideas for how to make this game more useable, that I might not implement immediately. Tracking these in [docs/planning/extension_ideas](./docs/planning/extension_ideas.md)
 
 ### Quick start
 
