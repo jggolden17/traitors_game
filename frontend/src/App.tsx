@@ -2,7 +2,9 @@ import { GameProvider, useGameStore } from './state/gameStore'
 import Home from './components/Home'
 import PlayerEntry from './components/PlayerEntry'
 import TopicSelection from './components/TopicSelection'
+import CustomSecrets from './components/CustomSecrets'
 import TopicAndOptions from './components/TopicAndOptions'
+import RevealInstructions from './components/RevealInstructions.tsx'
 import RevealCycle from './components/RevealCycle'
 import QuestionPhase from './components/QuestionPhase'
 import DiscussionTimer from './components/DiscussionTimer'
@@ -19,8 +21,12 @@ const StageRouter = () => {
       return <PlayerEntry />
     case 'topicSelect':
       return <TopicSelection />
+    case 'customSecrets':
+      return <CustomSecrets />
     case 'topicOptions':
       return <TopicAndOptions />
+    case 'instructions':
+      return <RevealInstructions />
     case 'reveal':
       return <RevealCycle />
     case 'questions':

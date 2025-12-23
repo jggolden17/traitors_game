@@ -6,8 +6,9 @@ import {
   useState,
   useCallback,
 } from 'react'
-import { secretOptions } from '../data/secrets'
+import { builtInSecretOptions } from '../data/secrets'
 import type {
+  BuiltInTopic,
   GameSettings,
   GameStage,
   GameState,
@@ -23,6 +24,7 @@ type GameStoreValue = GameState & {
   usePreviousList: (names: string[]) => void
   updateSettings: (settings: Partial<GameSettings>) => void
   startWithSettings: (settings: GameSettings) => void
+  setCustomSecrets: (values: string[]) => void
   nextPlayerReveal: () => void
   proceedToQuestions: () => void
   proceedToDiscussion: () => void
@@ -43,9 +45,12 @@ const initialState: GameState = {
   round: null,
   usedSecrets: {
     singers: [],
+    countriesAndCities: [],
     places: [],
     academics: [],
+    custom: [],
   },
+  customSecrets: [],
   lastWinner: null,
 }
 
@@ -60,23 +65,42 @@ const shuffle = (ids: string[]) => {
   return result
 }
 
-const buildSecretPool = (topic: GameTopic): SecretChoice[] => {
+const buildSecretPool = (
+  topic: GameTopic,
+  customSecrets: string[],
+): SecretChoice[] => {
   if (topic === 'any') {
-    return Object.entries(secretOptions).flatMap(([key, values]) =>
-      values.map((value) => ({
-        topic: key as SecretChoice['topic'],
-        value,
-      })),
+    const builtInPool = Object.entries(builtInSecretOptions).flatMap(
+      ([key, values]) =>
+        values.map((value) => ({
+          topic: key as BuiltInTopic,
+          value,
+        })),
     )
+    const customPool = customSecrets.map((value) => ({
+      topic: 'custom' as const,
+      value,
+    }))
+    return [...builtInPool, ...customPool]
   }
-  return secretOptions[topic].map((value) => ({ topic, value }))
+
+  if (topic === 'custom') {
+    return customSecrets.map((value) => ({ topic: 'custom' as const, value }))
+  }
+
+  const values = builtInSecretOptions[topic as BuiltInTopic] ?? []
+  return values.map((value) => ({ topic, value }))
 }
 
 const pickSecret = (
   topic: GameTopic,
   usedSecrets: GameState['usedSecrets'],
+  customSecrets: string[],
 ): { choice: SecretChoice; updatedUsed: GameState['usedSecrets'] } => {
-  const pool = buildSecretPool(topic)
+  const pool = buildSecretPool(topic, customSecrets)
+  if (pool.length === 0) {
+    throw new Error('No secrets available for the selected topic.')
+  }
   const usedSet =
     topic === 'any'
       ? new Set(Object.values(usedSecrets).flat())
@@ -101,11 +125,13 @@ const createRound = ({
   settings,
   usedSecrets,
   priorRound,
+  customSecrets,
 }: {
   players: Player[]
   settings: GameSettings
   usedSecrets: GameState['usedSecrets']
   priorRound: RoundState | null
+  customSecrets: string[]
 }): { round: RoundState; updatedUsed: GameState['usedSecrets'] } => {
   const alive = players.filter((p) => !p.eliminated)
   const traitorId =
@@ -115,7 +141,7 @@ const createRound = ({
 
   const needsNewSecret = !priorRound || settings.newSecretEachRound
   const { choice, updatedUsed } = needsNewSecret
-    ? pickSecret(settings.topic, usedSecrets)
+    ? pickSecret(settings.topic, usedSecrets, customSecrets)
     : { choice: priorRound!.secret, updatedUsed: usedSecrets }
 
   const playerOrder = shuffle(alive.map((p) => p.id))
@@ -173,6 +199,18 @@ const useGameStoreInternal = (): GameStoreValue => {
     }))
   }, [])
 
+  const setCustomSecrets = useCallback((values: string[]) => {
+    const normalized = Array.from(
+      new Set(values.map((value) => value.trim()).filter(Boolean)),
+    )
+
+    setState((prev) => ({
+      ...prev,
+      customSecrets: normalized,
+      usedSecrets: { ...prev.usedSecrets, custom: [] },
+    }))
+  }, [])
+
   const startWithSettings = useCallback((settings: GameSettings) => {
     setState((prev) => {
       const { round, updatedUsed } = createRound({
@@ -180,6 +218,7 @@ const useGameStoreInternal = (): GameStoreValue => {
         settings,
         usedSecrets: prev.usedSecrets,
         priorRound: null,
+        customSecrets: prev.customSecrets,
       })
 
       return {
@@ -187,7 +226,7 @@ const useGameStoreInternal = (): GameStoreValue => {
         settings,
         round,
         usedSecrets: updatedUsed,
-        stage: 'reveal',
+        stage: 'instructions',
         lastWinner: null,
       }
     })
@@ -268,6 +307,7 @@ const useGameStoreInternal = (): GameStoreValue => {
         settings: prev.settings,
         usedSecrets: prev.usedSecrets,
         priorRound: prev.settings.newSecretEachRound ? prev.round : prev.round,
+        customSecrets: prev.customSecrets,
       })
 
       return {
@@ -284,6 +324,7 @@ const useGameStoreInternal = (): GameStoreValue => {
     setState((prev) => ({
       ...initialState,
       previousPlayerLists: prev.previousPlayerLists,
+      customSecrets: prev.customSecrets,
     }))
   }, [])
 
@@ -294,6 +335,7 @@ const useGameStoreInternal = (): GameStoreValue => {
       setPlayers,
       usePreviousList,
       updateSettings,
+      setCustomSecrets,
       startWithSettings,
       nextPlayerReveal,
       proceedToQuestions,
@@ -308,6 +350,7 @@ const useGameStoreInternal = (): GameStoreValue => {
       setPlayers,
       usePreviousList,
       updateSettings,
+      setCustomSecrets,
       startWithSettings,
       nextPlayerReveal,
       proceedToQuestions,

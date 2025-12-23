@@ -1,53 +1,22 @@
-import type { GameTopic } from '../types'
+import type { BuiltInTopic, GameTopic } from '../types'
 
-const singers = [
-  'Taylor Swift',
-  'Beyoncé',
-  'Ed Sheeran',
-  'Adele',
-  'Billie Eilish',
-  'Drake',
-  'Dua Lipa',
-  'Harry Styles',
-  'Rihanna',
-  'Bruno Mars',
-]
+import { singers } from './singers'
+import { countriesAndCities } from './countriesAndCities'
+import { academics } from './academics'
+import { places } from './places'
 
-const places = [
-  'Paris',
-  'Tokyo',
-  'New York',
-  'Sydney Opera House',
-  'Grand Canyon',
-  'Sahara Desert',
-  'Great Barrier Reef',
-  'Machu Picchu',
-  'Venice',
-  'Iceland',
-]
-
-const academics = [
-  'Quantum Physics',
-  'Neuroscience',
-  'Astrophysics',
-  'Econometrics',
-  'Anthropology',
-  'Linguistics',
-  'Organic Chemistry',
-  'Game Theory',
-  'Medieval History',
-  'Machine Learning',
-]
-
-export const secretOptions: Record<Exclude<GameTopic, 'any'>, string[]> = {
+export const builtInSecretOptions: Record<BuiltInTopic, string[]> = {
   singers,
-  places,
+  countriesAndCities,
   academics,
+  places,
 }
 
 export const topicChoices: { key: GameTopic; label: string }[] = [
   { key: 'singers', label: 'Singers' },
-  { key: 'places', label: 'Places' },
+  { key: 'countriesAndCities', label: 'Countries and Cities' },
   { key: 'academics', label: 'Academic subjects' },
+  { key: 'places', label: 'Everyday places' },
+  { key: 'custom', label: 'Custom' },
   { key: 'any', label: 'Any (mix of all)' },
 ]
