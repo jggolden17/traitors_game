@@ -1,10 +1,20 @@
-export type GameTopic = 'singers' | 'places' | 'academics' | 'any'
+export type GameTopic =
+  | 'singers'
+  | 'countriesAndCities'
+  | 'academics'
+  | 'places'
+  | 'custom'
+  | 'any'
+
+export type BuiltInTopic = Exclude<GameTopic, 'any' | 'custom'>
 
 export type GameStage =
   | 'home'
   | 'playerEntry'
   | 'topicSelect'
+  | 'customSecrets'
   | 'topicOptions'
+  | 'instructions'
   | 'reveal'
   | 'questions'
   | 'discussion'
@@ -43,5 +53,6 @@ export interface GameState {
   stage: GameStage
   round: RoundState | null
   usedSecrets: Record<Exclude<GameTopic, 'any'>, string[]>
+  customSecrets: string[]
   lastWinner: 'traitor' | 'faithful' | null
 }

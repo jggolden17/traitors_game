@@ -39,6 +39,9 @@ const RevealCycle = () => {
   const isLast = round.currentPlayerIndex === round.playerOrder.length - 1
   const remaining =
     round.playerOrder.length - (round.currentPlayerIndex + 1)
+  const nextPlayerName = !isLast
+    ? players.find((p) => p.id === round.playerOrder[round.currentPlayerIndex + 1])?.name
+    : null
 
   return (
     <div className="flex flex-1 flex-col gap-4">
@@ -111,7 +114,7 @@ const RevealCycle = () => {
             disabled={!hasRevealed}
             className="rounded-full bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground transition active:translate-y-[1px] disabled:opacity-40"
           >
-            Pass to next
+            Pass to {nextPlayerName ?? 'next'}
           </button>
         )}
       </div>

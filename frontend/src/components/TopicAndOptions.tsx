@@ -1,21 +1,41 @@
 import type { FormEvent } from 'react'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { topicChoices } from '../data/secrets'
 import { useGameStore } from '../state/gameStore'
 import StepDots from './StepDots'
 
 const TopicAndOptions = () => {
-  const { settings, startWithSettings, setStage, players } = useGameStore()
+  const {
+    settings,
+    startWithSettings,
+    setStage,
+    players,
+    customSecrets,
+  } = useGameStore()
   const [timerMinutes, setTimerMinutes] = useState<number>(settings.timerMinutes)
   const [newSecretEachRound, setNewSecretEachRound] = useState<boolean>(
     settings.newSecretEachRound,
   )
+  const [formError, setFormError] = useState<string | null>(null)
+  useEffect(() => {
+    if (settings.topic === 'custom' && customSecrets.length === 0) {
+      setStage('customSecrets')
+    }
+  }, [settings.topic, customSecrets.length, setStage])
+
+  const customSummary = useMemo(() => {
+    if (settings.topic !== 'custom') return null
+    return customSecrets.length > 0
+      ? `${customSecrets.length} custom secrets ready`
+      : 'Add custom secrets first'
+  }, [customSecrets.length, settings.topic])
 
   const topicLabel =
     topicChoices.find((choice) => choice.key === settings.topic)?.label ?? 'Any topic'
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
+    setFormError(null)
     if (players.length < 2) {
       setStage('playerEntry')
       return
@@ -60,6 +80,24 @@ const TopicAndOptions = () => {
           </div>
         </div>
 
+        {customSummary && (
+          <div className="rounded-xl border border-border bg-surface px-4 py-3 text-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col">
+                <span className="text-muted">Custom secrets</span>
+                <span className="text-base font-semibold">{customSummary}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setStage('customSecrets')}
+                className="rounded-full px-3 py-2 text-xs font-semibold text-foreground/80"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+        )}
+
         <label className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3 text-sm font-semibold">
           <span>Discussion timer</span>
           <input
@@ -86,6 +124,10 @@ const TopicAndOptions = () => {
             className="h-5 w-5 rounded border-border bg-background text-accent focus:ring-accent"
           />
         </label>
+
+        {formError && (
+          <p className="text-sm font-semibold text-red-500">{formError}</p>
+        )}
 
         <div className="sticky bottom-0 -mx-4 flex items-center justify-end gap-3 bg-background/90 px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3 backdrop-blur">
           <button

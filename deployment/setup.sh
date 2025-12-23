@@ -2,6 +2,15 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Load .env file if it exists
+if [[ -f "${PROJECT_ROOT}/.env" ]]; then
+  set -a  # automatically export all variables
+  source "${PROJECT_ROOT}/.env"
+  set +a  # stop automatically exporting
+fi
+
 
 AWS_REGION="${AWS_REGION:-eu-west-1}"
 : "${APP_NAME:?APP_NAME is required (set in environment or .env)}"

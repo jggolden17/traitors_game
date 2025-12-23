@@ -5,7 +5,7 @@ import { useGameStore } from '../state/gameStore'
 import StepDots from './StepDots'
 
 const TopicSelection = () => {
-  const { settings, updateSettings, setStage, players } = useGameStore()
+  const { settings, updateSettings, setStage, players, customSecrets } = useGameStore()
   const [topic, setTopic] = useState<GameTopic>(settings.topic)
 
   useEffect(() => {
@@ -16,7 +16,11 @@ const TopicSelection = () => {
 
   const handleNext = () => {
     updateSettings({ topic })
-    setStage('topicOptions')
+    if (topic === 'custom') {
+      setStage('customSecrets')
+    } else {
+      setStage('topicOptions')
+    }
   }
 
   return (
@@ -35,26 +39,40 @@ const TopicSelection = () => {
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2">
-        {topicChoices.map((choice) => (
-          <label
-            key={choice.key}
-            className={`flex cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition ${
-              topic === choice.key
-                ? 'border-accent bg-accent text-accent-foreground'
-                : 'border-border bg-surface text-foreground'
-            }`}
-          >
-            <span className="text-base font-semibold">{choice.label}</span>
-            <input
-              type="radio"
-              name="topic"
-              value={choice.key}
-              checked={topic === choice.key}
-              onChange={() => setTopic(choice.key)}
-              className="hidden"
-            />
-          </label>
-        ))}
+        {topicChoices.map((choice) => {
+          const isCustom = choice.key === 'custom'
+          const customHelper = isCustom
+            ? customSecrets.length > 0
+              ? `${customSecrets.length} uploaded`
+              : ''
+            : null
+
+          return (
+            <label
+              key={choice.key}
+              className={`flex cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition ${
+                topic === choice.key
+                  ? 'border-accent bg-accent text-accent-foreground'
+                  : 'border-border bg-surface text-foreground'
+              }`}
+            >
+              <span className="text-base font-semibold">{choice.label}</span>
+              <div className="flex flex-col items-end">
+                {customHelper && (
+                  <span className="text-xs text-muted">{customHelper}</span>
+                )}
+                <input
+                  type="radio"
+                  name="topic"
+                  value={choice.key}
+                  checked={topic === choice.key}
+                  onChange={() => setTopic(choice.key)}
+                  className="hidden"
+                />
+              </div>
+            </label>
+          )
+        })}
       </div>
 
       <div className="sticky bottom-0 -mx-4 flex items-center justify-end gap-3 bg-background/90 px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3 backdrop-blur">
